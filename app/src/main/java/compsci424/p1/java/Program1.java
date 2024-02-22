@@ -5,7 +5,7 @@
  * for this program. Otherwise, feel free to edit these files, even
  * these pre-written comments or my provided code. You can add any
  * classes, methods, and data structures that you need to solve the
- * problem and display your solution in the correct format. 
+ * problem and display your solution in the correct format. .
  */
  package compsci424.p1.java;
 
