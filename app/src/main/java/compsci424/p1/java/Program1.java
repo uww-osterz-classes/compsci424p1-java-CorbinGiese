@@ -1,5 +1,5 @@
 /* COMPSCI 424 Program 1
- * Name:
+ * Name: Corbin Giese
  * 
  * This is a template. Program1.java *must* contain the main class
  * for this program. Otherwise, feel free to edit these files, even
@@ -7,7 +7,7 @@
  * classes, methods, and data structures that you need to solve the
  * problem and display your solution in the correct format.
  */
-package compsci424.p1.java;
+ package compsci424.p1.java;
 
 /**
  * Main class for this program. The required steps have been copied
@@ -15,15 +15,50 @@ package compsci424.p1.java;
  * help you understand your code, or for any other reason. Also feel
  * free to edit this comment to be more helpful for you.
  */
+import java.util.Scanner;
 public class Program1 {
     // Declare any class/instance variables that you need here.
-
     /**
      * @param args command-line arguments, which can be ignored
      */
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Version1 version1 = new Version1();
+        Version2 version2 = new Version2();
+        System.out.println("Enter commands of the form 'create N', 'destroy N', or 'end', where N is an integer between 0 and 15:");
+        boolean running = true;
+        while (running) {
+            String command = scanner.nextLine().trim();
+            String[] parts = command.split(" ");
+            String operation = parts[0];
+            if (operation.equals("end")) {
+                running = false;
+                continue;
+            }
+            int pid = Integer.parseInt(parts[1]);
+            switch (operation) {
+                case "create":
+                    version1.create(pid);
+                    version2.create(pid);
+                    break;
+                case "destroy":
+                    version1.destroy(pid);
+                    version2.destroy(pid);
+                    break;
+                default:
+                    System.out.println("Invalid command!");
+            }
+            System.out.println("Process tree after command in Version 1:");
+            version1.showProcessInfo();
+            System.out.println("Process tree after command in Version 2:");
+            version2.showProcessInfo();
+        }        
+    }
+}
 
-        // 1. Ask the user to enter commands of the form "create N",
+
+
+// 1. Ask the user to enter commands of the form "create N",
         //    "destroy N", or "end", where N is an integer between 0 
         //    and 15.
 
@@ -55,9 +90,3 @@ public class Program1 {
         //     the Version 1 running time.
 
         // 8. Repeat step 7, but with the Version 2 object.
-
-        // This line is here just to test the Gradle build procedure.
-        // You can delete it.
-        System.out.println("Builds without errors and runs to completion.");
-    }
-}

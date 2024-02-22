@@ -1,7 +1,7 @@
 /* COMPSCI 424 Program 1
- * Name:
+ * Name: Corbin Giese
  */
-package compsci424.p1.java;
+ package compsci424.p1.java;
 
 /** 
  * Implements the process creation hierarchy for Version 1, which uses
@@ -13,16 +13,23 @@ package compsci424.p1.java;
  * classes, methods, and data structures that you need to solve the
  * problem and display your solution in the correct format.
  */
+import java.util.ArrayList;
 public class Version1 {
     // Declare any class/instance variables that you need here.
-
+    private Version1PCB[] pcbs;
+    private boolean[] pcbFree;
     /**
      * Default constructor. Use this to allocate (if needed) and
      * initialize the PCB array, create the PCB for process 0, and do
      * any other initialization that is needed. 
      */
     public Version1() {
-
+        pcbs = new Version1PCB[16];
+        pcbFree = new boolean[16];
+        for (int i = 0; i < 16; i++) {
+            pcbs[i] = new Version1PCB(i);
+            pcbFree[i] = true;
+        }
     }
 
     /**
@@ -31,20 +38,19 @@ public class Version1 {
      * @return 0 if successful, not 0 if unsuccessful
      */
     int create(int parentPid) {
-        // If parentPid is not in the process hierarchy, do nothing; 
-        // your code may return an error code or message in this case,
-        // but it should not halt
-
-        // Assuming you've found the PCB for parentPid in the PCB array:
-        // 1. Allocate and initialize a free PCB object from the array
-        //    of PCB objects
-
-        // 2. Insert the newly allocated PCB object into parentPid's
-        //    list of children
-
-        // You can decide what the return value(s), if any, should be.
-        // If you change the return type/value(s), update the Javadoc.
-        return 0; // often means "success" or "terminated normally"
+        Version1PCB parent = pcbs[parentPid];
+        if (parent == null) {
+            System.out.println("Parent process does not exist.");
+            return -1;
+        }
+        int newPid = findFreePid();
+        if (newPid == -1) {
+            System.out.println("No free PCB available.");
+            return -1;
+        }
+        pcbs[newPid].setParent(parentPid);
+        parent.addChild(newPid);
+        return 0;
     }
 
     /**
@@ -54,25 +60,29 @@ public class Version1 {
      * @return 0 if successful, not 0 if unsuccessful
      */
     int destroy (int targetPid) {
-         // If targetPid is not in the process hierarchy, do nothing; 
-         // your code may return an error code or message in this case,
-         // but it should not halt
-
-         // Assuming you've found the PCB for targetPid in the PCB array:
-         // 1. Recursively destroy all descendants of targetPid, if it
-         //    has any, and mark their PCBs as "free" in the PCB array 
-         //    (i.e., deallocate them)
-
-         // 2. Remove targetPid from its parent's list of children
-
-         // 3. Deallocate targetPid's PCB and mark its PCB array entry
-         //    as "free"
-
-         // You can decide what the return value(s), if any, should be.
-         // If you change the return type/value(s), update the Javadoc.
-        return 0; // often means "success" or "terminated normally"
+        Version1PCB target = pcbs[targetPid];
+        if (target == null) {
+            System.out.println("Process does not exist.");
+            return -1;
+        }
+        destroyRecursive(targetPid);
+        int parentPid = target.getParent();
+        if (parentPid != -1) { 
+            pcbs[parentPid].removeChild(targetPid);
+        }
+        pcbs[targetPid] = null;
+        return 0;
     }
-
+    
+    private void destroyRecursive(int pid) {
+        Version1PCB process = pcbs[pid];
+        ArrayList<Integer> children = process.getChildren();
+        for (int childPid : children) {
+            destroyRecursive(childPid);
+            pcbs[childPid] = null;
+        }
+    }
+    
     /**
      * Traverse the process creation hierarchy graph, printing
      * information about each process as you go. See Canvas for the
@@ -84,9 +94,32 @@ public class Version1 {
      * the main program for printing. It's your choice. 
      */
     void showProcessInfo() {
-
+        for (int i = 0; i < 16; i++) {
+            if (pcbs[i] != null) {
+                System.out.print("Process " + i + ": parent is " + pcbs[i].getParent() + " and children are ");
+                ArrayList<Integer> children = pcbs[i].getChildren();
+                if (children.isEmpty()) {
+                    System.out.println("none");
+                } else {
+                    for (int child : children) {
+                        System.out.print(child + " ");
+                    }
+                    System.out.println();
+                }
+            }
+        }
     }
-
+    
+    private int findFreePid() {
+        for (int i = 0; i < 16; i++) {
+            if (pcbFree[i]) {
+                pcbFree[i] = false;
+                return i;
+            }
+        }
+        return -1;
+    }
+       
     /* If you need or want more methods, feel free to add them. */
     
 }
